@@ -11,8 +11,10 @@
 <script>
     export default {
         name: 'orderFormResult',
-        props: {
-            resltSum: Number
+        data () {
+            return {
+                resultSum: 0
+            }
         }
     }
 </script>
