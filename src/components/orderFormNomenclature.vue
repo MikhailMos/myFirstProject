@@ -31,7 +31,6 @@
         },
         methods: {
             selectedNomenclature: function () {
-                // console.log(this.selectedCustomer.name + ' ' + this.selectedProducts.length);
                 this.$emit('select', { selectedCustomer: this.selectedCustomer, selectedProducts: this.selectedProducts });
             }
         }

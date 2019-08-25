@@ -4,16 +4,18 @@
       <orderFormNomenclature class="orderForm__nomenclature" 
           :arrCustomers="arrCustomers"
           :dishes="dishes"
-          @select="selectedNomenclature"
+          @select="getNomenclature"
       ></orderFormNomenclature>
-      <orderFormResult class="orderForm__result"></orderFormResult>
+      <orderFormResult class="orderForm__result" 
+          
+      ></orderFormResult>
       <button class="orderForm__btn-remove" type="button" @click.prevent="onBtnClick()">&#8594;</button>
     </form>
   </div>
 </template>
 
 <script>
-  import orderFormNomenclature from './components/orderFormNomenclature.vue';
+  import orderFormNomenclature from './components/orderFormNomenclature.vue'
   import orderFormResult from './components/orderFormResult.vue'
 
   export default {
@@ -21,7 +23,8 @@
     data () {
       return {
         arrCustomers: arrCustomers(),
-        dishes: getDish()
+        dishes: getDish(),
+        selectedNomenclature: {}
       }
     },
     components: {
@@ -34,10 +37,12 @@
     // },
     methods: {
       onBtnClick: function () {
-        alert('oh!');
+        if (this.selectedNomenclature) {
+          this.$children[1].$data.selectedNomenclature = this.selectedNomenclature;
+        }
       },
-      selectedNomenclature: function (obj) {
-        console.log(obj.selectedCustomer.name + ' ' + obj.selectedProducts.length);
+      getNomenclature: function (obj) {
+        return this.selectedNomenclature = obj;
       }
     }
   }
