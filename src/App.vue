@@ -1,14 +1,13 @@
 <template>
   <div id="app">
-    <form class="orderForm" action="" method="POST">
-      <orderFormNomenclature class="orderForm__nomenclature" 
-          :arrCustomers="arrCustomers"
-          :dishes="dishes"
-          @select="getNomenclature"
+    <form class="orderForm">
+      <orderFormNomenclature
+        class="orderForm__nomenclature"
+        :arrCustomers="arrCustomers"
+        :dishes="dishes"
+        @select="getNomenclature"
       ></orderFormNomenclature>
-      <orderFormResult class="orderForm__result" 
-          
-      ></orderFormResult>
+      <orderFormResult class="orderForm__result" @send-data="loadToServer"></orderFormResult>
       <button class="orderForm__btn-remove" type="button" @click.prevent="onBtnClick()">&#8594;</button>
     </form>
   </div>
@@ -32,20 +31,35 @@
       orderFormResult
     },
     // created: {
-    //   getCustomers: getData(this.arrCustomers, path),
-    //   getDishes: getData(this.dishes, path)
+    //   getCustomers: getData(this.arrCustomers, get_clients),
+    //   getDishes: getData(this.dishes, get_dishes)
     // },
     methods: {
       onBtnClick: function () {
-        if (this.selectedNomenclature) {
-          this.$children[1].$data.selectedNomenclature = this.selectedNomenclature;
+        if (this.selectedNomenclature.selectedProducts) {
+          this.$children[1].$data.selectedProducts = this.selectedNomenclature.selectedProducts;
         }
       },
       getNomenclature: function (obj) {
         return this.selectedNomenclature = obj;
+      },
+      loadToServer: function (resProducts, sum) {
+        if (!this.selectedNomenclature.selectedCustomer) {
+          alert('Клиент не выбран.');
+        } else {
+          var data = new ObjPOST(this.selectedNomenclature.selectedCustomer, getDataProducts(resProducts), sum);
+          onSubmitClick(data);
+        }
       }
     }
   }
+
+  var SERV_IP = 'http://127.0.0.0';
+  var PORT = '8080';
+  var SAVE_ORDER = 'order';
+  var ORGANIZATION_GUID = '00000000-0000-0000-0000-000000000000';
+  var COMMENT_FROM_ORDER = 'test';
+  var PERSON_COUNT = 1;
 
   var NAME = ['Вася', 'Коля', 'Миша', 'Алексей', 'Иван', 'Григорий', 'Андрей'];
   var SURNAME = ['Пупкин', 'Иванович', 'Никифоров', 'Тимофеев'];
@@ -61,7 +75,7 @@
     var dataCustomers = new Array();
     var countCustomers = NAME.length + SURNAME.length;
     for (var i = 0; i < countCustomers; i++) {            
-      dataCustomers.push(CustomerObject(400 + i));
+      dataCustomers.push(CustomerObject("c0175e65-7251-d98d-a5d4-8a4f5ce918" + i));
     }
 
     return dataCustomers;
@@ -84,9 +98,29 @@
     return Math.floor(Math.random() * (max - min) + min);
   }
 
+  var getDateToStr = function () {
+    var date = new Date();
+    var dateStr = date.toISOString().replace('T', ' ');
+    return dateStr.substring(0, dateStr.length - 5);
+  }
+
+  var getDataProducts = function (arr) {
+    var result = [];
+    arr.forEach(function (el) {
+      var obj = {
+            "id": el.id,
+            "amount": "1",
+            "modifiers": []
+          };
+      result.push(obj);
+    });
+
+    return result;
+  }
+
   var DishObject = function () {
     return {
-      id: 1000,
+      id: 'ff9b5ea0-c702-4aad-848c-3b150ec38c4',
       grp_id: 2000,
       name: COOCING[getRandom(0, COOCING.length - 1)],
       color: 'rgb(' + getRandom(0, 255) + ', ' + getRandom(0, 255) + ', ' + getRandom(0, 255) + ')',
@@ -142,44 +176,121 @@
     }
   }
 
+  var ObjPOST = function (customer, products, sum) {
+    return {
+      "organization": ORGANIZATION_GUID,
+      "customer": {
+        "id": customer.id,
+        "name": customer.name,
+        "surName": customer.surname,
+        "phone": customer.phone
+      },
+      "order": {
+        "id": "" + getRandom(0, 10000),
+        "externalId": "0000000000000000000000000",
+        "date": getDateToStr(),
+        "phone": customer.phone,
+        "items": products,
+        "isSelfService": false,
+        "comment": COMMENT_FROM_ORDER,
+        "personsCount": PERSON_COUNT,
+        "address": {
+          "city": "Санкт-Петербург",
+          "home": "25",
+          "comment": "константа Address_comment",
+          "street": "Морской",
+          "housing": "2",
+          "apartment": "8"
+        },
+        "fullSum": sum,
+        "paymentItems": [
+          {
+            "sum": sum,
+            "paymentType": {
+              "code": "CASH"
+            },
+          "isProcessedExternally": false
+          }
+        ]
+      }
+    }
+  }
+
   // var getData = function (whereLoad, somePath) {
-  //   fetch(serv_ip + ':' + port + '/' + somePath)
+  //   fetch(SERV_IP + ':' + PORT + '/' + somePath)
   //     .then(function (response) {
-  //       return response.json();
+  //         return response.json();
   //     })
   //     .then(function (data) {
-  //       whereLoad = data;
+  //       if (response.ok) {
+  //         return data;
+  //       } else {
+  //         return Promise.reject({status: response.status, data});
+  //       }
   //     })
+  //     .then(function (result) {
+  //       console.log('success:', result)
+  //     })
+  //     .catch(function (error) {
+  //       console.log('error:', error)
+  //     });
   // }
+
+  var onSubmitClick = function (dataForm) {
+
+    fetch(SERV_IP + ':' + PORT + '/' + SAVE_ORDER, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(dataForm)
+    })
+    .then(function (response) {  
+      if (response.status >= 200 && response.status < 300) {  
+        return Promise.resolve(response);
+      } else {  
+        return Promise.reject(new Error(response.statusText)); 
+      }
+    })
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (data) {
+      console.log('Запрос выполнен с запросом JSON', data);
+    })
+    .catch(function (error) {
+      console.log('Запрос не выполнен', error);
+    });    
+  };
 </script>
 
 <style>
-  #app {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    color: #2c3e50;
-  }
+#app {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+}
 
-  .orderForm {
-      padding: 10px;
-      min-height: 200px;
-      border: 1px solid black;
-      
-      display: flex;
-      justify-content: space-between;
-  }
+.orderForm {
+  padding: 10px;
+  min-height: 200px;
+  border: 1px solid black;
 
-  .orderForm__nomenclature,
-  .orderForm__result {
-      width: 48%;
-  }
+  display: flex;
+  justify-content: space-between;
+}
 
-  .orderForm__result {
-      order: 1;
-  }
+.orderForm__nomenclature,
+.orderForm__result {
+  width: 48%;
+}
 
-  .orderForm__btn-remove {
-      align-self: center;
-  }
+.orderForm__result {
+  order: 1;
+}
+
+.orderForm__btn-remove {
+  align-self: center;
+}
 </style>

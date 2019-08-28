@@ -4,14 +4,17 @@
                 v-model="selectedProductsForDel"
                 @keyup.delete="delOption"
         >
-            <option v-for="item in changeProducts"
+            <option v-for="item in changeProducts()"
                     :key="item.id"
                     :value="item"                    
             >{{ item.name }}</option>
         </select>
         <p class="result-section__sumStr">Сумма: {{ changeSum() }} руб.</p>
         <div class="wrapper_btn">
-            <button class="result-section__submit" type="submit">Отправить</button>
+            <button class="result-section__submit" type="submit" 
+                @click.prevent="submit"
+                @keyup.enter.prevent="submit"
+            >Отправить</button>
         </div>
     </div>
 </template>
@@ -21,48 +24,59 @@
         name: 'orderFormResult',
         data () {
             return {
+                sumProducts: Number,
                 resProducts: [],
                 selectedProductsForDel: [],
-                selectedNomenclature: Object
+                selectedProducts: []
             }
         },
-        computed: {
+        methods: {
             changeProducts: function () {
-                if (this.selectedNomenclature.selectedProducts) {
+                if (this.selectedProducts) {
                     if (this.resProducts) {
-                        var noHas = this.selectedNomenclature.selectedProducts.filter(el => {
+                        var noHas = this.selectedProducts.filter(el => {
                             return this.resProducts.indexOf(el) === -1;
                         });
                     }
                         
                     Array.prototype.push.apply(this.resProducts, 
-                        (this.resProducts ? noHas : this.selectedNomenclature.selectedProducts)
+                        (this.resProducts ? noHas : this.selectedProducts)
                     );  
                     
                     this.changeSum();
                 }
 
                 return this.resProducts;
-            }
-        },
-        methods: {
+            },
             changeSum: function () {
                 if (this.resProducts) {
                     var sum = 0;
                     this.resProducts.forEach(function (element) {                    
                         sum += element.cost;
                     });
-
-                    return sum;
-                } else { return 0 }
-                
+                } else { sum = 0 }
+                this.sumProducts = sum;
+                return this.sumProducts;
             },
             delOption: function () {
                 return this.resProducts = this.resProducts.filter(el => {
                     return this.selectedProductsForDel.indexOf(el) === -1;
                 });
+            },
+            submit: function () {
+               //проверка на заполненность
+               var textError = '';
+               
+               if (this.resProducts.length === 0) {
+                   textError = 'Продукт не выбран.';
+               }
+
+                if (textError) {
+                   alert(textError);
+               } else {
+                   this.$emit('send-data', this.resProducts, this.sumProducts);
+               } 
             }
-            
         }
     }
 </script>

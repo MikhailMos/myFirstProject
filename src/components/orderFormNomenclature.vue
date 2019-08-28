@@ -1,14 +1,16 @@
 <template>
     <div class="nomenclature-section">
         <select v-model="selectedCustomer" @change="selectedNomenclature()"  name="customers" id="customers" class="nomenclature__customers" >
-            <!-- <option disabled selected>Выбирите покупателя...</option> -->
+            <option value="0" disabled selected>Выбирите покупателя...</option>
             <option v-for="item in arrCustomers" 
+                    v-if="!item.isDeleted"
                     :key="item.id" 
                     :value="item"
             >{{ item.name + ' ' + item.surname }}</option>
         </select>
         <select v-model="selectedProducts" @change="selectedNomenclature()" name="products" id="products" class="nomenclature__products" multiple>
             <option v-for="item in dishes"
+                    v-if="!item.deleted"
                     :key="item.id"
                     :value="item"
             >{{ item.name }}</option>
