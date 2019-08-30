@@ -4,8 +4,8 @@
                 v-model="selectedProductsForDel"
                 @keyup.delete="delOption"
         >
-            <option v-for="item in changeProducts()"
-                    :key="item.id"
+            <option v-for="(item, index) in resProducts"
+                    :key="index"
                     :value="item"                    
             >{{ item.name }}</option>
         </select>
@@ -26,21 +26,19 @@
             return {
                 sumProducts: Number,
                 resProducts: [],
-                selectedProductsForDel: [],
-                selectedProducts: []
+                selectedProductsForDel: []
             }
+        },
+        props: {
+            selectedCustomer: Object,
+            selectedProducts: Array
         },
         methods: {
             changeProducts: function () {
                 if (this.selectedProducts) {
-                    if (this.resProducts) {
-                        var noHas = this.selectedProducts.filter(el => {
-                            return this.resProducts.indexOf(el) === -1;
-                        });
-                    }
                         
                     Array.prototype.push.apply(this.resProducts, 
-                        (this.resProducts ? noHas : this.selectedProducts)
+                        this.selectedProducts
                     );  
                     
                     this.changeSum();
@@ -66,16 +64,96 @@
             submit: function () {
                //проверка на заполненность
                var textError = '';
+
+               if (!this.selectedCustomer.id) {
+                    textError = 'Клиент не выбран.';
+                }
                
                if (this.resProducts.length === 0) {
-                   textError = 'Продукт не выбран.';
+                   textError = (textError.length > 0) ? (textError + '\n' + 'Продукт не выбран.') : 'Продукт не выбран.';
                }
 
                 if (textError) {
                    alert(textError);
                } else {
-                   this.$emit('send-data', this.resProducts, this.sumProducts);
+                   var data = new ObjPOST(this.selectedCustomer, this.resProducts, this.sumProducts);
+                   this.$emit('send-data', data);
                } 
+            }
+        }
+    }
+
+    var ORGANIZATION_GUID = '00000000-0000-0000-0000-000000000000';
+	var COMMENT_FROM_ORDER = 'test';
+    var PERSON_COUNT = 1;
+    
+    var getRandom = function (min, max) {
+		return Math.floor(Math.random() * (max - min) + min);
+    }
+    
+    var getAmount = function (id, arr) {
+        return arr.filter(el => el.id === id).length;
+    }
+
+    var getProductsForData = function (arr) {
+        var res = [];
+        arr.forEach(function (item, index, thisArray) {
+            var amount = getAmount(item.id, thisArray);
+            if (!res.find(el => el.id === item.id)) {
+                res.push(
+                    {
+                        "id": item.id,
+                        "amount": amount,
+                        "modifiers": []
+                    }
+                );
+            }
+        });
+        return res;
+    }
+
+    var getDateToStr = function () {
+		var date = new Date();
+		var dateStr = date.toISOString().replace('T', ' ');
+		return dateStr.substring(0, dateStr.length - 5);
+	}
+
+    var ObjPOST = function (customer, products, sum) {
+        return {
+            "organization": ORGANIZATION_GUID,
+            "customer": {
+                "id": customer.id,
+                "name": customer.name,
+                "surName": customer.surname,
+                "phone": customer.phone
+            },
+            "order": {
+                "id": "" + getRandom(0, 10000),
+                "externalId": "0000000000000000000000000",
+                "date": getDateToStr(),
+                "phone": customer.phone,
+                "items": getProductsForData(products),
+                "isSelfService": false,
+                "comment": COMMENT_FROM_ORDER,
+                "personsCount": PERSON_COUNT,
+                "address": {
+                    "city": "Санкт-Петербург",
+                    "home": "25",
+                    "comment": "константа Address_comment",
+                    "street": "Морской",
+                    "housing": "2",
+                    "apartment": "8"
+                },
+                "fullSum": sum,
+                "paymentItems": [
+                    {
+                        "sum": sum,
+                        "paymentType": {
+                            "code": "CASH"
+                        },
+                        "isProcessedExternally": false
+                    }
+                ]
             }
         }
     }
