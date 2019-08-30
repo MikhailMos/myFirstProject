@@ -65,7 +65,7 @@
                //проверка на заполненность
                var textError = '';
 
-               if (!this.selectedCustomer.id) {
+               if (!this.selectedCustomer || !this.selectedCustomer.id) {
                     textError = 'Клиент не выбран.';
                 }
                
