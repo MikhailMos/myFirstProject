@@ -89,20 +89,6 @@
 		return Math.floor(Math.random() * (max - min) + min);
 	}
 
-	// var getDataProducts = function (arr) {
-	//   var result = [];
-	//   arr.forEach(function (el) {
-	//     var obj = {
-	//           "id": el.id,
-	//           "amount": "1",
-	//           "modifiers": []
-	//         };
-	//     result.push(obj);
-	//   });
-
-	//   return result;
-	// }
-
 	var DishObject = function () {
 		return {
             id: 'ff9b5ea0-c702-4aad-848c-3b150ec38c4',

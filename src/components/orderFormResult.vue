@@ -76,7 +76,7 @@
                 if (textError) {
                    alert(textError);
                } else {
-                   var data = new ObjPOST(this.selectedCustomer, this.resProducts, this.sumProducts);
+                   var data = new ObjPOST(this.selectedCustomer, this.resProducts, this.sumProducts, this.getRandom(0, 10000));
                    this.$emit('send-data', data);
                } 
             }
@@ -86,10 +86,6 @@
     var ORGANIZATION_GUID = '00000000-0000-0000-0000-000000000000';
 	var COMMENT_FROM_ORDER = 'test';
     var PERSON_COUNT = 1;
-    
-    var getRandom = function (min, max) {
-		return Math.floor(Math.random() * (max - min) + min);
-    }
     
     var getAmount = function (id, arr) {
         return arr.filter(el => el.id === id).length;
@@ -118,7 +114,7 @@
 		return dateStr.substring(0, dateStr.length - 5);
 	}
 
-    var ObjPOST = function (customer, products, sum) {
+    var ObjPOST = function (customer, products, sum, idOrder) {
         return {
             "organization": ORGANIZATION_GUID,
             "customer": {
@@ -128,7 +124,7 @@
                 "phone": customer.phone
             },
             "order": {
-                "id": "" + getRandom(0, 10000),
+                "id": "" + idOrder,
                 "externalId": "0000000000000000000000000",
                 "date": getDateToStr(),
                 "phone": customer.phone,
