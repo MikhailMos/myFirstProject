@@ -1,20 +1,25 @@
 <template>
     <div class="nomenclature-section">
-        <select v-model="selectedCustomer" @change="selectedNomenclature()"  name="customers" id="customers" class="nomenclature__customers" >
-            <option value="0" disabled selected>Выберите покупателя...</option>
-            <option v-for="(item, index) in arrCustomers"
+        <el-select v-model="selectedCustomer" placeholder="Выберите покупателя" @change="selectedNomenclature()"  name="customers" id="customers" class="nomenclature__customers" >
+            <el-option v-for="item in arrCustomers"
                     v-if="!item.isDeleted"
-                    :key="index" 
-                    :value="item"
-            >{{ item.name + ' ' + item.surname }}</option>
-        </select>
-        <select v-model="selectedProducts" @change="selectedNomenclature()" name="products" id="products" class="nomenclature__products" multiple>
-            <option v-for="(item, index) in dishes"
+                    :key="item.id" 
+                    :value="item.id"
+                    :label="item.name + ' ' + item.surname"
+            ></el-option>
+        </el-select>
+        <el-select v-model="selectedProducts" 
+                    placeholder="Выберите блюдо" 
+                    @change="selectedNomenclature()" 
+                    name="products" id="products" 
+                    class="nomenclature__products" multiple>
+            <el-option v-for="(item, index) in dishes"
                     v-if="!item.deleted"
                     :key="index"
-                    :value="item"
-            >{{ item.name }}</option>
-        </select>
+                    :value="item.id"
+                    :label="item.name"
+            ></el-option>
+        </el-select>
     </div>
 </template>
 
@@ -35,8 +40,8 @@
             selectedNomenclature: function () {
                 this.$emit('select', 
                     { 
-                        selectedCustomer: ((this.selectedCustomer) ? this.selectedCustomer : {}),
-                        selectedProducts: ((this.selectedProducts) ? this.selectedProducts : {})
+                        selectedCustomer: this.selectedCustomer,
+                        selectedProducts: ((this.selectedProducts) ? this.selectedProducts : [])
                     }
                 );
             }
@@ -52,10 +57,6 @@
 
     .nomenclature__customers {
         margin-bottom: 10px;
-    }
-
-    .nomenclature__products {
-        flex-grow: 1;
     }
 
     .lists__products {

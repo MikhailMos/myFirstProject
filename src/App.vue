@@ -1,25 +1,27 @@
 <template>
 	<div id="app">
 		<form class="orderForm">
-		<orderFormNomenclature
-			class="orderForm__nomenclature"
-			:arrCustomers="arrCustomers"
-			:dishes="dishes"
-			@select="getNomenclature"
-		></orderFormNomenclature>
-		<orderFormResult class="orderForm__result" 
-            @send-data="loadToServer"
-            :selectedProducts="selectedNomenclature.selectedProducts"
-            :selectedCustomer="selectedNomenclature.selectedCustomer"  
-        ></orderFormResult>
-		<button class="orderForm__btn-remove" type="button" @click.prevent="onBtnRemoveClick()">&#8594;</button>
+            <orderFormNomenclature
+                class="orderForm__nomenclature"
+                :arrCustomers="arrCustomers"
+                :dishes="dishes"
+                @select="getNomenclature"
+            ></orderFormNomenclature>
+            <orderFormResult class="orderForm__result" 
+                @send-data="loadToServer"
+                :selectedIdProducts="selectedNomenclature.selectedProducts"
+                :selectedIdCustomer="selectedNomenclature.selectedCustomer"
+                :dishes="dishes"
+                :arrCustomers="arrCustomers"
+            ></orderFormResult>
+            <el-button class="orderForm__btn-remove el-icon-arrow-right" type="button" @click.prevent="onBtnRemoveClick()"></el-button>
 		</form>
 	</div>
 </template>
 
 <script>
-	import orderFormNomenclature from './components/orderFormNomenclature'
-    import orderFormResult from './components/orderFormResult'
+	import orderFormNomenclature from './components/orderFormNomenclature.vue'
+    import orderFormResult from './components/orderFormResult.vue'
 
 	export default {
 		name: 'app',

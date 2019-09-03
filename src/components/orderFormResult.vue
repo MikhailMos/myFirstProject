@@ -1,20 +1,25 @@
 <template>
     <div class="result-section">
-        <select class="result-section__list" name="resultOrder" id="resultOrder" multiple
+        <el-select class="result-section__list"
+                name="resultOrder"
+                id="resultOrder"
+                placeholder=""
+                multiple
                 v-model="selectedProductsForDel"
                 @keyup.delete="delOption"
         >
-            <option v-for="(item, index) in resProducts"
+            <el-option v-for="(item, index) in resProducts"
                     :key="index"
-                    :value="item"                    
-            >{{ item.name }}</option>
-        </select>
+                    :value="item.id"
+                    :label="item.name"                    
+            ></el-option>
+        </el-select>
         <p class="result-section__sumStr">Сумма: {{ changeSum() }} руб.</p>
         <div class="wrapper_btn">
-            <button class="result-section__submit" type="submit" 
+            <el-button class="result-section__submit" type="submit" 
                 @click.prevent="submit"
                 @keyup.enter.prevent="submit"
-            >Отправить</button>
+            >Отправить</el-button>
         </div>
     </div>
 </template>
@@ -30,17 +35,21 @@
             }
         },
         props: {
-            selectedCustomer: Object,
-            selectedProducts: Array
+            selectedIdCustomer: String,
+            selectedIdProducts: Array,
+            dishes: Array,
+            arrCustomers: Array
         },
         methods: {
             changeProducts: function () {
-                if (this.selectedProducts) {
+                if (this.selectedIdProducts) {
+                    this.selectedIdProducts.forEach(id => {
+                        var tempItem = this.dishes.find(item => item.id === id);
+                        if (tempItem) {
+                            this.resProducts.push(tempItem);
+                        }
+                    })
                         
-                    Array.prototype.push.apply(this.resProducts, 
-                        this.selectedProducts
-                    );  
-                    
                     this.changeSum();
                 }
 
@@ -65,7 +74,7 @@
                //проверка на заполненность
                var textError = '';
 
-               if (!this.selectedCustomer || !this.selectedCustomer.id) {
+               if (!this.selectedIdCustomer) {
                     textError = 'Клиент не выбран.';
                 }
                
@@ -76,7 +85,8 @@
                 if (textError) {
                    alert(textError);
                } else {
-                   var data = new ObjPOST(this.selectedCustomer, this.resProducts, this.sumProducts, this.getRandom(0, 10000));
+                   var currentCustomer = this.arrCustomers.find(el => el.id === this.selectedIdCustomer);
+                   var data = new ObjPOST(currentCustomer, this.resProducts, this.sumProducts, this.getRandom(0, 10000));
                    this.$emit('send-data', data);
                } 
             }
