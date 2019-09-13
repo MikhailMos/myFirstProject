@@ -1,22 +1,20 @@
 <template>
     <div class="result-section">
-        <el-select class="result-section__list"
-                name="resultOrder"
-                id="resultOrder"
-                placeholder=""
-                multiple
-                v-model="selectedProductsForDel"
-                @keyup.delete="delOption"
-        >
-            <el-option v-for="(item, index) in resProducts"
+        <ul class="result-section__list list">
+            <li v-for="(item, index) in arrProducts"
                     :key="index"
-                    :value="item.id"
-                    :label="item.name"                    
-            ></el-option>
-        </el-select>
-        <p class="result-section__sumStr">Сумма: {{ changeSum() }} руб.</p>
+                    :value="item"
+                    class="list__item" 
+            >
+                {{ item.name }} - {{ item.price }}р.
+                <el-button type="danger" icon="el-icon-delete" circle
+                    class="btn btn__delete"
+                    @click="delOption(item)"></el-button>                
+            </li>
+        </ul>
+        <p class="result-section__sumStr">Сумма: {{ changeSum }} руб.</p>
         <div class="wrapper_btn">
-            <el-button class="result-section__submit" type="submit" 
+            <el-button class="result-section__submit" type="primary" 
                 @click.prevent="submit"
                 @keyup.enter.prevent="submit"
             >Отправить</el-button>
@@ -30,45 +28,32 @@
         data () {
             return {
                 sumProducts: Number,
-                resProducts: [],
-                selectedProductsForDel: []
+                resProducts: []
             }
         },
         props: {
-            selectedIdCustomer: String,
-            selectedIdProducts: Array,
-            dishes: Array,
-            arrCustomers: Array
+            selectedIdCustomer: '',
+            arrProducts: null,
+            arrCustomers: null
         },
-        methods: {
-            changeProducts: function () {
-                if (this.selectedIdProducts) {
-                    this.selectedIdProducts.forEach(id => {
-                        var tempItem = this.dishes.find(item => item.id === id);
-                        if (tempItem) {
-                            this.resProducts.push(tempItem);
-                        }
-                    })
-                        
-                    this.changeSum();
-                }
-
-                return this.resProducts;
-            },
-            changeSum: function () {
-                if (this.resProducts) {
+        computed: {
+             changeSum: function () {
+                if (this.arrProducts) {
                     var sum = 0;
-                    this.resProducts.forEach(function (element) {                    
-                        sum += element.cost;
+                    this.arrProducts.forEach(function (element) {                    
+                        sum += element.price;
                     });
                 } else { sum = 0 }
                 this.sumProducts = sum;
                 return this.sumProducts;
-            },
-            delOption: function () {
-                return this.resProducts = this.resProducts.filter(el => {
-                    return this.selectedProductsForDel.indexOf(el) === -1;
-                });
+            }
+        },
+        methods: {
+            delOption: function (item) {
+                var i = this.arrProducts.indexOf(item);
+                if (i !== -1) {
+                    this.arrProducts.splice(i, 1);
+                }
             },
             submit: function () {
                //проверка на заполненность
@@ -171,9 +156,60 @@
         flex-direction: column;
     }
 
-    .result-section__list {
+    .result-section__list {        
+        margin: 0;
+        padding: 0;        
+        color: #606266;
+        border: 1px solid #DCDFE6;
+        border-radius: 4px;
+        outline: 0;
         flex-grow: 1;
     }
+
+    .result-section__list:hover {
+        transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    }
+
+    .result-section__list:hover {
+        border-color: #C0C4CC;
+    }
+
+    /* .result-section__list:focus {
+        border-color: #409EFF;
+    } */
+
+    .list {
+        list-style: none;
+        font-family: 'Times New Roman', Times, sans-serif;
+        font-size: 14px;
+    }
+
+    .list__item {
+        margin: 0px 5px;
+        padding: 5px 20px;
+        border-radius: 4px;
+        /* cursor: pointer; */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .list__item:hover,
+    .list__item--focus {
+        color: #409EFF;
+        background-color: #F5F7FA;
+
+        
+    }
+
+    .btn__delete {
+        display: none;
+    }
+
+    .list__item:hover .btn__delete {
+        display: block;
+    }
+
     .result-section__sumStr,
     .wrapper_btn {
         text-align: right;

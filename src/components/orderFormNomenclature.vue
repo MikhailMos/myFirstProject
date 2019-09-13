@@ -8,18 +8,15 @@
                     :label="item.name + ' ' + item.surname"
             ></el-option>
         </el-select>
-        <el-select v-model="selectedProducts" 
-                    placeholder="Выберите блюдо" 
-                    @change="selectedNomenclature()" 
-                    name="products" id="products" 
-                    class="nomenclature__products" multiple>
-            <el-option v-for="(item, index) in dishes"
+        <ul class="nomenclature__products products">
+            <li v-for="(item, index) in dishes"
                     v-if="!item.deleted"
                     :key="index"
-                    :value="item.id"
-                    :label="item.name"
-            ></el-option>
-        </el-select>
+                    :value="item"
+                    @click="selectedNomenclature(item)"
+                    class="products__item" :class="{'products__item--focus': selectedProducts === item}"
+            >{{ item.name }} - {{ item.price }}р.</li>
+        </ul>
     </div>
 </template>
 
@@ -29,7 +26,7 @@
         data () {
             return {
                 selectedCustomer: '',
-                selectedProducts: []
+                selectedProducts: {}
             }
         },
         props: {
@@ -37,11 +34,12 @@
             dishes: Array
         },
         methods: {
-            selectedNomenclature: function () {
+            selectedNomenclature: function (item) {
+                this.selectedProducts = item ? item : null;
                 this.$emit('select', 
                     { 
                         selectedCustomer: this.selectedCustomer,
-                        selectedProducts: ((this.selectedProducts) ? this.selectedProducts : [])
+                        selectedProducts: this.selectedProducts
                     }
                 );
             }
@@ -57,6 +55,42 @@
 
     .nomenclature__customers {
         margin-bottom: 10px;
+    }
+
+    .nomenclature__products {
+        font-family: 'Times New Roman', Times, sans-serif;
+        font-size: 14px;
+        color: #606266;
+        border: 1px solid #DCDFE6;
+        border-radius: 4px; 
+        flex-grow: 1;
+    }
+
+    .nomenclature__products:hover {
+        transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    }
+
+    .nomenclature__products:hover {
+        border-color: #C0C4CC;
+    }
+
+    .products {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .products__item {
+        margin: 5px;
+        padding: 5px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .products__item:hover,
+    .products__item--focus {
+        color: #409EFF;
+        background-color: #F5F7FA;
     }
 
     .lists__products {
