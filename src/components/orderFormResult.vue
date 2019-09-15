@@ -27,8 +27,7 @@
         name: 'orderFormResult',
         data () {
             return {
-                sumProducts: Number,
-                resProducts: []
+                sumProducts: Number
             }
         },
         props: {
@@ -63,7 +62,7 @@
                     textError = 'Клиент не выбран.';
                 }
                
-               if (this.resProducts.length === 0) {
+               if (this.arrProducts.length === 0) {
                    textError = (textError.length > 0) ? (textError + '\n' + 'Продукт не выбран.') : 'Продукт не выбран.';
                }
 
@@ -71,7 +70,7 @@
                    alert(textError);
                } else {
                    var currentCustomer = this.arrCustomers.find(el => el.id === this.selectedIdCustomer);
-                   var data = new ObjPOST(currentCustomer, this.resProducts, this.sumProducts, this.getRandom(0, 10000));
+                   var data = new ObjPOST(currentCustomer, this.arrProducts, this.sumProducts, this.getRandom(0, 10000));
                    this.$emit('send-data', data);
                } 
             }
