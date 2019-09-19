@@ -1,5 +1,9 @@
 <template>
   <div id="app">
+    <section v-if="errored">
+        <p class="error-message">Извините, не удается получить данные, попробуйте обновить страницу чуть позже.</p>
+    </section>
+    
     <form ref="form" class="orderForm">
         <orderFormNomenclature
             class="orderForm__nomenclature"
@@ -31,8 +35,9 @@
         name: 'app',
         data () {
             return {
-                arrCustomers: [],
-                dishes: [],
+                arrCustomers: null,
+                dishes: null,
+                errored: false,
                 selectedNomenclature: {},
                 sendDishes: []
             }
@@ -42,33 +47,17 @@
             orderFormResult
 		},
 		created () {
-            dataDishes.getProducts(dish => {
-                this.dishes = dish;
-            }),
+            
+
+            // load MOK-data
+            // dataDishes.getProducts(dish => {
+            //     this.dishes = dish;
+            // }),
             dataCustomers.getCustomers(customer => {
                 this.arrCustomers = customer;
-            })
-            
-		//   getCustomers: getData(this.arrCustomers, get_clients),
-		    // getDishes: function () {
-            //     fetch(SERV_IP + ':' + PORT + '/getKDS_bydishes')
-            //         .then(function (response) {
-            //             return response.json();
-            //         })
-            //         .then(function (data) {
-            //         if (response.ok) {
-            //             return data;
-            //         } else {
-            //             return Promise.reject({status: response.status, data});
-            //         }
-            //         })
-            //         .then(function (result) {
-            //         console.log('success:', result)
-            //         })
-            //         .catch(function (error) {
-            //         console.log('error:', error)
-            //         })
-            // }
+            }),
+
+            this.getData()
         },
         methods: {
             onBtnCopyToResultClick: function () {
@@ -76,41 +65,58 @@
                     this.sendDishes.push(this.selectedNomenclature.selectedProducts);
                 }
             },
+
             getNomenclature: function (obj) {
                 return this.selectedNomenclature = obj;
             },
+
             loadToServer: function (data) {
                 onSubmitClick(data);
+            },
+
+            getData: function () {
+                fetch(SERV_IP + ':' + PORT + '/' + SAVE_ORDER)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            return Promise.reject({status: response.status, data});
+                        }
+                    })
+                    .then(result => {
+                        this.dishes = result;
+                    })
+                    .catch(error => {
+                        console.log('error:', error);
+                        this.errored = true;
+                    })
+
+                // axios
+                //     .get(SERV_IP + ':' + PORT + '/' + SAVE_ORDER)
+                //     .then(response => {
+                //         console.log(response)
+                //         if (response.status === 200) {
+                //             this.dishes = response.data;
+                //         } else {
+                //             return Promise.reject({status: response.status, data});
+                //         }
+                //     })
+                //     .catch(error => {
+                //         console.log(error)
+                //         this.errored = true;
+                //     });
             }
+
         }
     }
 
-    var SERV_IP = 'http://x.ksh.ru';
-	var PORT = '9876';
-	var SAVE_ORDER = 'getKDS_bydishes';
+    const SERV_IP = 'http://x.ksh.ru';
+	const PORT = '9876';
+	const SAVE_ORDER = 'getKDS_bydishes';
 
-	
-	// var getData = function (whereLoad, somePath) {
-	//   fetch(SERV_IP + ':' + PORT + '/' + somePath)
-	//     .then(function (response) {
-	//         return response.json();
-	//     })
-	//     .then(function (data) {
-	//       if (response.ok) {
-	//         return data;
-	//       } else {
-	//         return Promise.reject({status: response.status, data});
-	//       }
-	//     })
-	//     .then(function (result) {
-	//       console.log('success:', result)
-	//     })
-	//     .catch(function (error) {
-	//       console.log('error:', error)
-	//     });
-	// }
-
-	var onSubmitClick = function (dataForm) {
+    // const axios = require('axios').default;
+    
+	const onSubmitClick = function (dataForm) {
 
 		fetch(SERV_IP + ':' + PORT + '/' + SAVE_ORDER, {
             method: 'POST',
@@ -166,5 +172,13 @@
 
     .orderForm__btn-remove {
         align-self: center;
+    }
+
+    .error-message {
+        padding: 20px 0;
+        color: #ffffff;
+        background-color: rgba(255, 0, 0, 0.7);
+        text-align: center;
+        border-radius: 5px;
     }
 </style>
