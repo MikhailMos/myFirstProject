@@ -47,8 +47,6 @@
             orderFormResult
 		},
 		created () {
-            
-
             // load MOK-data
             // dataDishes.getProducts(dish => {
             //     this.dishes = dish;
