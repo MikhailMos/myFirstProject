@@ -196,10 +196,9 @@
 
     .list__item:hover,
     .list__item--focus {
+        font-size: 16px;
         color: #409EFF;
         background-color: #F5F7FA;
-
-        
     }
 
     .btn__delete {
