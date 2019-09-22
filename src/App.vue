@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <section v-if="errored">
-        <p class="error-message">Извините, не удается получить данные, попробуйте обновить страницу чуть позже.</p>
+        <p class="error-message">{{ this.errorMessage }}</p>
     </section>
     
     <form ref="form" class="orderForm">
@@ -18,14 +18,14 @@
             :selectedIdCustomer="selectedNomenclature.selectedCustomer"
             :arrCustomers="arrCustomers"
         ></orderFormResult>
-        <el-button class="orderForm__btn-remove el-icon-arrow-right" type="button" @click.prevent="onBtnCopyToResultClick()"></el-button>
+        <el-button class="orderForm__btn-copy el-icon-arrow-right" type="button" @click.prevent="onBtnCopyToResultClick()"></el-button>
     </form>
    
   </div>
 </template>
 
 <script>
-    import dataDishes from './api/dataDishes.js'
+    // import dataDishes from './api/dataDishes.js'
     import dataCustomers from './api/dataCustomers.js'
 
     import orderFormNomenclature from './components/orderFormNomenclature.vue'
@@ -38,6 +38,7 @@
                 arrCustomers: null,
                 dishes: null,
                 errored: false,
+                errorMessage: '',
                 selectedNomenclature: {},
                 sendDishes: []
             }
@@ -54,8 +55,9 @@
             dataCustomers.getCustomers(customer => {
                 this.arrCustomers = customer;
             }),
-
-            this.getData()
+           
+            this.getData(SERV_IP + ':' + PORT + '/' + PATH_DISHES, 'dishes')
+            // this.getData(SERV_IP + ':' + PORT + '/' + PATH_CUSTOMERS, 'customers')
         },
         methods: {
             onBtnCopyToResultClick: function () {
@@ -72,21 +74,30 @@
                 onSubmitClick(data);
             },
 
-            getData: function () {
-                fetch(SERV_IP + ':' + PORT + '/' + SAVE_ORDER)
+            getData: function (_url, flag) {
+                let who = (flag === 'dishes') ? 'Блюдам' : 'Покупателям';
+                fetch(_url)
                     .then(response => {
                         if (response.ok) {
                             return response.json();
                         } else {
-                            return Promise.reject({status: response.status, data});
+                            return Promise.reject({status: response.status, response});
                         }
                     })
                     .then(result => {
-                        this.dishes = result;
+                        if (flag === 'dishes') {
+                            let arr = [];
+                            result.forEach(item => {
+                                arr.push(item.Elements_list_main[0]);
+                            })
+                            this.dishes = arr;
+                        } else {
+                            this.arrCustomers = result;
+                        }
                     })
-                    .catch(error => {
-                        console.log('error:', error);
+                    .catch( () => {
                         this.errored = true;
+                        this.errorMessage = 'Извините, не удается получить данные по ' + who + ', попробуйте обновить страницу чуть позже.';
                     })
 
                 // axios
@@ -110,7 +121,9 @@
 
     const SERV_IP = 'http://x.ksh.ru';
 	const PORT = '9876';
-	const SAVE_ORDER = 'getKDS_bydishes';
+	const PATH_DISHES = 'getKDS_bydishes';
+    const PATH_CUSTOMERS = 'getKDS_bycustomers';
+    const SAVE_ORDER = 'save_order';
 
     // const axios = require('axios').default;
     
@@ -168,12 +181,15 @@
         order: 1;
     }
 
-    .orderForm__btn-remove {
+    .orderForm__btn-copy {
+        margin-left: 5px !important;
+        margin-right: 5px !important;
         align-self: center;
     }
 
     .error-message {
         padding: 20px 0;
+        font-size: 22px;
         color: #ffffff;
         background-color: rgba(255, 0, 0, 0.7);
         text-align: center;

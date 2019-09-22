@@ -15,7 +15,7 @@
                     :value="item"
                     @click="selectedNomenclature(item)"
                     class="products__item" :class="{'products__item--focus': selectedProducts === item}"
-            >{{ item.name }} - {{ item.price }}р.</li>
+            >{{ item.Orit_name }}</li>
         </ul>
     </div>
 </template>

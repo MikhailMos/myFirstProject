@@ -6,7 +6,7 @@
                     :value="item"
                     class="list__item" 
             >
-                {{ item.name }} - {{ item.price }}р.
+                {{ item.Orit_name }}р.
                 <el-button type="danger" icon="el-icon-delete" circle
                     class="btn btn__delete"
                     @click="delOption(item)"></el-button>                
@@ -40,7 +40,8 @@
                 if (this.arrProducts) {
                     var sum = 0;
                     this.arrProducts.forEach(function (element) {                    
-                        sum += element.price;
+                        // sum += element.price;
+                        sum += element.Orit_count;
                     });
                 } else { sum = 0 }
                 this.sumProducts = sum;
@@ -82,17 +83,17 @@
     var PERSON_COUNT = 1;
     
     var getAmount = function (id, arr) {
-        return arr.filter(el => el.id === id).length;
+        return arr.filter(el => el.Orit_id === id).length;
     }
 
     var getProductsForData = function (arr) {
         var res = [];
         arr.forEach(function (item, index, thisArray) {
-            var amount = getAmount(item.id, thisArray);
-            if (!res.find(el => el.id === item.id)) {
+            var amount = getAmount(item.Orit_id, thisArray);
+            if (!res.find(el => el.Orit_id === item.Orit_id)) {
                 res.push(
                     {
-                        "id": item.id,
+                        "id": item.Orit_id,
                         "amount": amount,
                         "modifiers": []
                     }
