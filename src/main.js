@@ -8,13 +8,13 @@ Vue.use(ElementUI);
 
 Vue.config.productionTip = false
 
-Vue.mixin({
-  methods: {
-    getRandom: function (min, max) {
-      return Math.floor(Math.random() * (max - min) + min);
-    }
-  }
-})
+// Vue.mixin({
+//   methods: {
+//     getRandom: function (min, max) {
+//       return Math.floor(Math.random() * (max - min) + min);
+//     }
+//   }
+// })
 
 new Vue({
   render: h => h(App),

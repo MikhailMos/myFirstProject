@@ -9,6 +9,7 @@
             class="orderForm__nomenclature"
             :arrCustomers="arrCustomers"
             :dishes="dishes"
+            :groups="grpDishes"
             @select="getNomenclature"
         ></orderFormNomenclature>
 
@@ -18,7 +19,6 @@
             :selectedIdCustomer="selectedNomenclature.selectedCustomer"
             :arrCustomers="arrCustomers"
         ></orderFormResult>
-        <el-button class="orderForm__btn-copy el-icon-arrow-right" type="button" @click.prevent="onBtnCopyToResultClick()"></el-button>
     </form>
    
   </div>
@@ -36,6 +36,7 @@
         data () {
             return {
                 arrCustomers: null,
+                grpDishes: null,
                 dishes: null,
                 errored: false,
                 errorMessage: '',
@@ -56,18 +57,22 @@
                 this.arrCustomers = customer;
             }),
            
-            this.getData(SERV_IP + ':' + PORT + '/' + PATH_DISHES, 'dishes')
+           this.getData('https://data-sibers.firebaseio.com/dish-group/productgroups.json', 'GRP_DISH')
+           this.getData('https://data-sibers.firebaseio.com/dish-arr/0/dishes.json', 'DISH')
+
+            // this.getData(SERV_IP + ':' + PORT + '/' + PATH_DISHES, 'grp_dishes')
+            // this.getData(SERV_IP + ':' + PORT + '/' + PATH_DISHES, 'dishes')
             // this.getData(SERV_IP + ':' + PORT + '/' + PATH_CUSTOMERS, 'customers')
         },
-        methods: {
-            onBtnCopyToResultClick: function () {
-                if (this.selectedNomenclature.selectedProducts) {
-                    this.sendDishes.push(this.selectedNomenclature.selectedProducts);
-                }
-            },
+        
+        methods: {          
 
             getNomenclature: function (obj) {
-                return this.selectedNomenclature = obj;
+                this.selectedNomenclature = obj;
+
+                if (this.selectedNomenclature.selectedProducts) {
+                    return this.sendDishes.push(this.selectedNomenclature.selectedProducts);
+                }
             },
 
             loadToServer: function (data) {
@@ -75,7 +80,15 @@
             },
 
             getData: function (_url, flag) {
-                let who = (flag === 'dishes') ? 'Блюдам' : 'Покупателям';
+                let who = '';
+                if (flag === 'GRP_DISH') {
+                    who = 'группам Блюд';
+                } else if (flag === 'GRP_DISH') {
+                    who = 'Блюдам';
+                } else {
+                    who = 'Покупателям';
+                }
+                             
                 fetch(_url)
                     .then(response => {
                         if (response.ok) {
@@ -85,12 +98,24 @@
                         }
                     })
                     .then(result => {
-                        if (flag === 'dishes') {
+                        if (flag === 'GRP_DISH') {
                             let arr = [];
                             result.forEach(item => {
-                                arr.push(item.Elements_list_main[0]);
+                                if (!item.deleted) {
+                                    arr.push(item);
+                                }
+                            })
+                            this.grpDishes = arr;
+                            console.log(arr[0]);
+                        } else if (flag === 'DISH') {
+                            let arr = [];
+                            result.forEach(item => {
+                                if (item.type === flag && !item.deleted) {
+                                    arr.push(item);
+                                }
                             })
                             this.dishes = arr;
+                            console.log(arr[0]);
                         } else {
                             this.arrCustomers = result;
                         }
@@ -120,8 +145,8 @@
     }
 
     const SERV_IP = 'http://x.ksh.ru';
-	const PORT = '9876';
-	const PATH_DISHES = 'getKDS_bydishes';
+	const PORT = '2222';
+	const PATH_DISHES = 'get_dishes2';
     const PATH_CUSTOMERS = 'getKDS_bycustomers';
     const SAVE_ORDER = 'save_order';
 

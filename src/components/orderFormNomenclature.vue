@@ -8,15 +8,22 @@
                     :label="item.name + ' ' + item.surname"
             ></el-option>
         </el-select>
-        <ul class="nomenclature__products products">
-            <li v-for="(item, index) in dishes"
-                    v-if="!item.deleted"
-                    :key="index"
-                    :value="item"
-                    @click="selectedNomenclature(item)"
-                    class="products__item" :class="{'products__item--focus': selectedProducts === item}"
-            >{{ item.Orit_name }}</li>
-        </ul>
+        <div class="nomenclature__products products">
+            <el-tabs tab-position="left" style="min-height: 200px; min-weight: 50px;">
+                <el-tab-pane v-for="group in groups"
+                    :key="group.id"
+                    :label="group.name"
+                >
+                    <li v-for="(item, index) in dishes"
+                            v-if="item.grp_id === group.id"
+                            :key="index"
+                            :value="item"
+                            @click="selectedNomenclature(item)"
+                            class="products__item"
+                    >{{ item.name }} - цена {{ item.defaultSalePrice }}₽</li>
+                </el-tab-pane>
+            </el-tabs>
+        </div>
     </div>
 </template>
 
@@ -31,6 +38,7 @@
         },
         props: {
             arrCustomers: Array,
+            groups: Array,
             dishes: Array
         },
         methods: {
