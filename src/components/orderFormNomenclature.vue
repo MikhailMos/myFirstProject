@@ -14,13 +14,15 @@
                     :key="group.id"
                     :label="group.name"
                 >
-                    <li v-for="(item, index) in dishes"
-                            v-if="item.grp_id === group.id"
-                            :key="index"
-                            :value="item"
-                            @click="selectedNomenclature(item)"
-                            class="products__item"
-                    >{{ item.name }} - цена {{ item.defaultSalePrice }}₽</li>
+                    <ul class="products__list">
+                        <li v-for="(item, index) in dishes"
+                                v-if="item.grp_id === group.id"
+                                :key="index"
+                                :value="item"
+                                @click="selectedNomenclature(item)"
+                                class="products__item"
+                        >{{ item.name }} - цена {{ item.defaultSalePrice }}₽</li>
+                    </ul>
                 </el-tab-pane>
             </el-tabs>
         </div>
@@ -82,7 +84,8 @@
         border-color: #C0C4CC;
     }
 
-    .products {
+    .products,
+    .products__list {
         list-style: none;
         margin: 0;
         padding: 0;

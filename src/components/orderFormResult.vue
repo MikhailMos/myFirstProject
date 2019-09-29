@@ -6,7 +6,12 @@
                     :value="item"
                     class="list__item" 
             >
-                {{ item.Orit_name }}р.
+                {{ item.name }} кол-во: {{ item.count }}
+
+                <el-input-number v-model="item.count" 
+                    :min="1" :max="99"
+                    size="mini"
+                ></el-input-number>
                 <el-button type="danger" icon="el-icon-delete" circle
                     class="btn btn__delete"
                     @click="delOption(item)"></el-button>                
@@ -41,7 +46,7 @@
                     var sum = 0;
                     this.arrProducts.forEach(function (element) {                    
                         // sum += element.price;
-                        sum += element.Orit_count;
+                        sum += element.defaultSalePrice;
                     });
                 } else { sum = 0 }
                 this.sumProducts = sum;
@@ -70,8 +75,8 @@
                 if (textError) {
                    alert(textError);
                } else {
-                   var currentCustomer = this.arrCustomers.find(el => el.id === this.selectedIdCustomer);
-                   var data = new ObjPOST(currentCustomer, this.arrProducts, this.sumProducts, this.getRandom(0, 10000));
+                   let currentCustomer = this.arrCustomers.find(el => el.id === this.selectedIdCustomer);
+                   let data = new ObjPOST(currentCustomer, this.arrProducts, this.sumProducts, this.getRandom(0, 10000));
                    this.$emit('send-data', data);
                } 
             }
@@ -201,13 +206,13 @@
         background-color: #F5F7FA;
     }
 
-    .btn__delete {
+    /* .btn__delete {
         display: none;
     }
 
     .list__item:hover .btn__delete {
         display: block;
-    }
+    } */
 
     .result-section__sumStr,
     .wrapper_btn {

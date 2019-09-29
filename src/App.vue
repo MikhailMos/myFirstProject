@@ -4,13 +4,19 @@
         <p class="error-message">{{ this.errorMessage }}</p>
     </section>
     
-    <form ref="form" class="orderForm">
+    <form ref="form" 
+            class="orderForm"
+            v-loading="loading"
+            element-loading-text="Загрузка..."
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(0, 0, 0, 0.8)"
+    >
         <orderFormNomenclature
             class="orderForm__nomenclature"
             :arrCustomers="arrCustomers"
             :dishes="dishes"
             :groups="grpDishes"
-            @select="getNomenclature"
+            @select="addItemResult"
         ></orderFormNomenclature>
 
         <orderFormResult class="orderForm__result" 
@@ -41,7 +47,8 @@
                 errored: false,
                 errorMessage: '',
                 selectedNomenclature: {},
-                sendDishes: []
+                sendDishes: [],
+                loading: true
             }
 		},
 		components: {
@@ -64,14 +71,25 @@
             // this.getData(SERV_IP + ':' + PORT + '/' + PATH_DISHES, 'dishes')
             // this.getData(SERV_IP + ':' + PORT + '/' + PATH_CUSTOMERS, 'customers')
         },
-        
+
         methods: {          
 
-            getNomenclature: function (obj) {
+            addItemResult: function (obj) {
                 this.selectedNomenclature = obj;
 
                 if (this.selectedNomenclature.selectedProducts) {
-                    return this.sendDishes.push(this.selectedNomenclature.selectedProducts);
+                    let indexItem = this.sendDishes.indexOf(this.selectedNomenclature.selectedProducts);
+
+                    if (indexItem === -1) {
+                        this.sendDishes.push(this.selectedNomenclature.selectedProducts);
+                        this.sendDishes[this.sendDishes.length - 1].count = 1;
+                    } else {
+                        let changeItem = this.sendDishes.find(el => el === this.selectedNomenclature.selectedProducts);
+                        
+                        if (changeItem) {
+                            changeItem.count++;
+                        }
+                    }
                 }
             },
 
@@ -106,7 +124,7 @@
                                 }
                             })
                             this.grpDishes = arr;
-                            console.log(arr[0]);
+                            
                         } else if (flag === 'DISH') {
                             let arr = [];
                             result.forEach(item => {
@@ -115,12 +133,13 @@
                                 }
                             })
                             this.dishes = arr;
-                            console.log(arr[0]);
+                            this.loading = false;
                         } else {
                             this.arrCustomers = result;
                         }
                     })
                     .catch( () => {
+                        this.loading = false;
                         this.errored = true;
                         this.errorMessage = 'Извините, не удается получить данные по ' + who + ', попробуйте обновить страницу чуть позже.';
                     })
