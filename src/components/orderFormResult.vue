@@ -58,23 +58,37 @@
             },
             submit: function () {
                //проверка на заполненность
-               var textError = '';
+               var textError = {
+                   errCustomer: '',
+                   errDish: ''
+               };
 
                if (!this.selectedIdCustomer) {
-                    textError = 'Клиент не выбран.';
+                    textError.errCustomer = 'Клиент не выбран!';
                 }
                
                if (this.arrProducts.length === 0) {
-                   textError = (textError.length > 0) ? (textError + '\n' + 'Продукт не выбран.') : 'Продукт не выбран.';
+                   textError.errDish = 'Продукт не выбран!';
                }
 
-                if (textError) {
-                   alert(textError);
+                if (textError.errCustomer || textError.errDish) {
+                    if (textError.errCustomer) {
+                        this.openMessage(textError.errCustomer);
+                    }
+                    if (textError.errDish) {
+                        this.openMessage(textError.errDish);
+                    }
                } else {
                    let currentCustomer = this.arrCustomers.find(el => el.id === this.selectedIdCustomer);
                    let data = new ObjPOST(currentCustomer, this.arrProducts, this.sumProducts, this.getRandom(0, 10000));
                    this.$emit('send-data', data);
                } 
+            },
+            openMessage: function (msg) {
+                this.$notify.error({
+                    title: 'Ошибка',
+                    message: msg
+                });
             }
         }
     }
