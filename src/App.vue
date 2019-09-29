@@ -85,9 +85,11 @@
                         this.sendDishes[this.sendDishes.length - 1].count = 1;
                     } else {
                         let changeItem = this.sendDishes.find(el => el === this.selectedNomenclature.selectedProducts);
-                        
+                        let indexItem = this.sendDishes.indexOf(changeItem);
+
                         if (changeItem) {
                             changeItem.count++;
+                            this.sendDishes.splice(indexItem, 1, changeItem);
                         }
                     }
                 }

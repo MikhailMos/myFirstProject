@@ -8,10 +8,6 @@
             >
                 {{ item.name }} кол-во: {{ item.count }}
 
-                <el-input-number v-model="item.count" 
-                    :min="1" :max="99"
-                    size="mini"
-                ></el-input-number>
                 <el-button type="danger" icon="el-icon-delete" circle
                     class="btn btn__delete"
                     @click="delOption(item)"></el-button>                
@@ -87,19 +83,14 @@
 	var COMMENT_FROM_ORDER = 'test';
     var PERSON_COUNT = 1;
     
-    var getAmount = function (id, arr) {
-        return arr.filter(el => el.Orit_id === id).length;
-    }
-
     var getProductsForData = function (arr) {
         var res = [];
         arr.forEach(function (item, index, thisArray) {
-            var amount = getAmount(item.Orit_id, thisArray);
-            if (!res.find(el => el.Orit_id === item.Orit_id)) {
+            if (!res.find(el => el.id === item.id)) {
                 res.push(
                     {
-                        "id": item.Orit_id,
-                        "amount": amount,
+                        "id": item.id,
+                        "amount": item.count,
                         "modifiers": []
                     }
                 );
