@@ -38,13 +38,12 @@
         },
         computed: {
              changeSum: function () {
-                if (this.arrProducts) {
-                    var sum = 0;
-                    this.arrProducts.forEach(function (element) {                    
-                        // sum += element.price;
-                        sum += element.defaultSalePrice;
-                    });
-                } else { sum = 0 }
+                let sum = 0;
+
+                if (this.arrProducts) {                    
+                    this.arrProducts.forEach(el => { sum += (el.defaultSalePrice * el.count) });
+                }
+                
                 this.sumProducts = sum;
                 return this.sumProducts;
             }
