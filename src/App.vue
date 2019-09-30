@@ -84,8 +84,7 @@
                         this.sendDishes.push(this.selectedNomenclature.selectedProducts);
                         this.sendDishes[this.sendDishes.length - 1].count = 1;
                     } else {
-                        let changeItem = this.sendDishes.find(el => el === this.selectedNomenclature.selectedProducts);
-                        let indexItem = this.sendDishes.indexOf(changeItem);
+                        let changeItem = this.sendDishes[this.selectedNomenclature.selectedProducts];
 
                         if (changeItem) {
                             changeItem.count++;
