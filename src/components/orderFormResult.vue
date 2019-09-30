@@ -43,21 +43,21 @@
                 if (this.arrProducts) {                    
                     this.arrProducts.forEach(el => { sum += (el.defaultSalePrice * el.count) });
                 }
-                
+
                 this.sumProducts = sum;
                 return this.sumProducts;
             }
         },
         methods: {
             delOption: function (item) {
-                var i = this.arrProducts.indexOf(item);
+                let i = this.arrProducts.indexOf(item);
                 if (i !== -1) {
                     this.arrProducts.splice(i, 1);
                 }
             },
             submit: function () {
                //проверка на заполненность
-               var textError = {
+                let textError = {
                    errCustomer: '',
                    errDish: ''
                };
@@ -92,12 +92,12 @@
         }
     }
 
-    var ORGANIZATION_GUID = '00000000-0000-0000-0000-000000000000';
-	var COMMENT_FROM_ORDER = 'test';
-    var PERSON_COUNT = 1;
+    const ORGANIZATION_GUID = '00000000-0000-0000-0000-000000000000';
+	const COMMENT_FROM_ORDER = 'test';
+    const PERSON_COUNT = 1;
     
-    var getProductsForData = function (arr) {
-        var res = [];
+    const getProductsForData = function (arr) {
+        let res = [];
         arr.forEach(function (item, index, thisArray) {
             if (!res.find(el => el.id === item.id)) {
                 res.push(
@@ -112,13 +112,13 @@
         return res;
     }
 
-    var getDateToStr = function () {
-		var date = new Date();
-		var dateStr = date.toISOString().replace('T', ' ');
+    const getDateToStr = function () {
+		let date = new Date();
+		let dateStr = date.toISOString().replace('T', ' ');
 		return dateStr.substring(0, dateStr.length - 5);
 	}
 
-    var ObjPOST = function (customer, products, sum, idOrder) {
+    const ObjPOST = function (customer, products, sum, idOrder) {
         return {
             "organization": ORGANIZATION_GUID,
             "customer": {
