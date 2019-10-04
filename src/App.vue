@@ -21,9 +21,10 @@
 
         <orderFormResult class="orderForm__result" 
             @send-data="loadToServer"
-            :arrProducts="sendDishes"
+            :selectProduct="selectedNomenclature.selectedProducts"
             :selectedIdCustomer="selectedNomenclature.selectedCustomer"
             :arrCustomers="arrCustomers"
+            @clearSelectProduct="clearSelectProduct"
         ></orderFormResult>
     </form>
    
@@ -76,25 +77,13 @@
 
             addItemResult: function (obj) {
                 this.selectedNomenclature = obj;
-
-                if (this.selectedNomenclature.selectedProducts) {
-                    let indexItem = this.sendDishes.indexOf(this.selectedNomenclature.selectedProducts);
-
-                    if (indexItem === -1) {
-                        this.sendDishes.push(this.selectedNomenclature.selectedProducts);
-                        this.sendDishes[this.sendDishes.length - 1].count = 1;
-                    } else {
-                        let changeItem = this.sendDishes[this.selectedNomenclature.selectedProducts];
-
-                        if (changeItem) {
-                            changeItem.count++;
-                            this.sendDishes.splice(indexItem, 1, changeItem);
-                        }
-                    }
-                }
+            },
+            // обнуляем выбранное значение
+            clearSelectProduct () {
+                this.selectedNomenclature.selectedProducts = null;
             },
 
-            loadToServer: function (data) {
+            loadToServer (data) {
                 onSubmitClick(data);
             },
 
@@ -130,6 +119,7 @@
                             let arr = [];
                             result.forEach(item => {
                                 if (item.type === flag && !item.deleted) {
+                                    item.count = 1;
                                     arr.push(item);
                                 }
                             })

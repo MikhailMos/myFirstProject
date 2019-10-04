@@ -1,12 +1,14 @@
 <template>
     <div class="result-section">
         <ul class="result-section__list list">
-            <li v-for="(item, index) in arrProducts"
+            <li v-for="(item, index) in addItem"
                     :key="index"
                     :value="item"
                     class="list__item" 
             >
                 {{ item.name }} кол-во: {{ item.count }}
+
+                <el-input-number size="mini" v-model="item.count" :min="1" :max="99"></el-input-number>
 
                 <el-button type="danger" icon="el-icon-delete" circle
                     class="btn btn__delete"
@@ -28,36 +30,57 @@
         name: 'orderFormResult',
         data () {
             return {
+                dishes: [],
                 sumProducts: Number
             }
         },
         props: {
             selectedIdCustomer: '',
-            arrProducts: null,
+            selectProduct: null,
             arrCustomers: null
         },
         computed: {
-             changeSum: function () {
-                let sum = 0;
+            addItem () {
 
-                if (this.arrProducts) {                    
-                    this.arrProducts.forEach(el => { sum += (el.defaultSalePrice * el.count) });
+                if (this.selectProduct) {
+                    let itemIndex = this.dishes.indexOf(this.selectProduct);
+                    // //делаем копию объекта
+                    // let copyItem = Object.assign({}, this.selectProduct);
+
+                    if (itemIndex === -1) {
+                        this.dishes.push(this.selectProduct);                        
+                    } else {
+                        this.dishes[itemIndex].count++;
+                    }
+                    this.$emit('clearSelectProduct');
+
+                    // return this.dishes;
                 }
-
+                
+                return this.dishes;
+            },
+            changeSum () {
+                let sum = 0;
+                if (this.dishes.length) {
+                    this.dishes.forEach(el => { sum += (el.defaultSalePrice * el.count) });
+                }
                 this.sumProducts = sum;
                 return this.sumProducts;
             }
         },
         methods: {
-            delOption: function (item) {
-                let i = this.arrProducts.indexOf(item);
+            delOption (item) {
+                let i = this.dishes.indexOf(item);
                 if (i !== -1) {
-                    this.arrProducts.splice(i, 1);
+                    // присваиваем значение по умолчанию
+                    this.dishes[i].count = 1;
+                    this.dishes.splice(i, 1);
                 }
+
             },
-            submit: function () {
+            submit () {
                //проверка на заполненность
-                let textError = {
+               var textError = {
                    errCustomer: '',
                    errDish: ''
                };
@@ -66,7 +89,7 @@
                     textError.errCustomer = 'Клиент не выбран!';
                 }
                
-               if (this.arrProducts.length === 0) {
+               if (this.dishes.length === 0) {
                    textError.errDish = 'Продукт не выбран!';
                }
 
@@ -79,11 +102,11 @@
                     }
                } else {
                    let currentCustomer = this.arrCustomers.find(el => el.id === this.selectedIdCustomer);
-                   let data = new ObjPOST(currentCustomer, this.arrProducts, this.sumProducts, this.getRandom(0, 10000));
+                   let data = new ObjPOST(currentCustomer, this.dishes, this.sumProducts, this.getRandom(0, 10000));
                    this.$emit('send-data', data);
                } 
             },
-            openMessage: function (msg) {
+            openMessage (msg) {
                 this.$notify.error({
                     title: 'Ошибка',
                     message: msg
@@ -92,12 +115,12 @@
         }
     }
 
-    const ORGANIZATION_GUID = '00000000-0000-0000-0000-000000000000';
-	const COMMENT_FROM_ORDER = 'test';
-    const PERSON_COUNT = 1;
+    var ORGANIZATION_GUID = '00000000-0000-0000-0000-000000000000';
+	var COMMENT_FROM_ORDER = 'test';
+    var PERSON_COUNT = 1;
     
-    const getProductsForData = function (arr) {
-        let res = [];
+    var getProductsForData = function (arr) {
+        var res = [];
         arr.forEach(function (item, index, thisArray) {
             if (!res.find(el => el.id === item.id)) {
                 res.push(
@@ -112,13 +135,13 @@
         return res;
     }
 
-    const getDateToStr = function () {
-		let date = new Date();
-		let dateStr = date.toISOString().replace('T', ' ');
+    var getDateToStr = function () {
+		var date = new Date();
+		var dateStr = date.toISOString().replace('T', ' ');
 		return dateStr.substring(0, dateStr.length - 5);
 	}
 
-    const ObjPOST = function (customer, products, sum, idOrder) {
+    var ObjPOST = function (customer, products, sum, idOrder) {
         return {
             "organization": ORGANIZATION_GUID,
             "customer": {
