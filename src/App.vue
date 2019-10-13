@@ -143,31 +143,16 @@
               ", попробуйте обновить страницу чуть позже.";
           });
 
-        // axios
-        //     .get(SERV_IP + ':' + PORT + '/' + SAVE_ORDER)
-        //     .then(response => {
-        //         console.log(response)
-        //         if (response.status === 200) {
-        //             this.dishes = response.data;
-        //         } else {
-        //             return Promise.reject({status: response.status, data});
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.log(error)
-        //         this.errored = true;
-        //     });
       }
     }
   };
 
+  // пока оставлю
   // const SERV_IP = "http://x.ksh.ru";
   // const PORT = "2222";
   // const PATH_DISHES = "get_dishes2";
   // const PATH_CUSTOMERS = "getKDS_bycustomers";
   // const SAVE_ORDER = "save_order";
-
-  // const axios = require('axios').default;
 
 </script>
 
