@@ -2,7 +2,7 @@
     <div class="nomenclature-section">
         <el-select v-model="selectedCustomer" placeholder="Выберите покупателя" @change="selectedNomenclature()"  name="customers" id="customers" class="nomenclature__customers" >
             <el-option v-for="item in arrCustomers"
-                    v-if="!item.isDeleted"
+                    v-show="!item.isDeleted"
                     :key="item.id" 
                     :value="item.id"
                     :label="item.name + ' ' + item.surname"
@@ -16,7 +16,7 @@
                 >
                     <ul class="products__list">
                         <li v-for="(item, index) in dishes"
-                                v-if="item.grp_id === group.id"
+                                v-show="item.grp_id === group.id"
                                 :key="index"
                                 :value="item"
                                 @click="selectedNomenclature(item)"
