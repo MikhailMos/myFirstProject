@@ -27,18 +27,19 @@
 </template>
 
 <script>
-  import dataToSend from '../api/createDataToSend.js';
+  import backend from '../api/backend.js';
 
   export default {
     name: "orderFormResult",
     data() {
       return {
         dishes: [],
-        sumProducts: Number
+        sumProducts: Number,
+        hasError: false
       };
     },
     props: {
-      selectedIdCustomer: '',
+      selectedIdCustomer: String,
       selectProduct: Object,
       arrCustomers: Array
     },
@@ -71,13 +72,7 @@
       }
     },
     methods: {
-      changeSum() {
-        if (this.dishes.length) {
-          this.dishes.forEach(el => {
-            this.sumProducts += el.defaultSalePrice * el.count;
-          });
-        }
-      },
+
       delOption(item) {
         let i = this.dishes.indexOf(item);
         if (i !== -1) {
@@ -88,31 +83,26 @@
       },
       submit() {
         //проверка на заполненность
-        var textError = {
-          errCustomer: "",
-          errDish: ""
-        };
 
         if (!this.selectedIdCustomer) {
-          textError.errCustomer = "Клиент не выбран!";
+          this.openMessage(NO_SELECTED_CUSTOMER);
+          this.hasError = true;
+        } else {
+          this.hasError = false;
         }
 
         if (this.dishes.length === 0) {
-          textError.errDish = "Продукт не выбран!";
+          this.openMessage(NO_SELECTED_DISHES);
+          this.hasError = true;
+        } else {
+          this.hasError = false;
         }
 
-        if (textError.errCustomer || textError.errDish) {
-          if (textError.errCustomer) {
-            this.openMessage(textError.errCustomer);
-          }
-          if (textError.errDish) {
-            this.openMessage(textError.errDish);
-          }
-        } else {
+        if (!this.hasError) {
           let currentCustomer = this.arrCustomers.find(
             el => el.id === this.selectedIdCustomer
           );
-          let data = new dataToSend.ObjPOST(
+          let data = new backend.ObjPOST(
             currentCustomer,
             this.dishes,
             this.sumProducts,
@@ -129,6 +119,9 @@
       }
     }
   };
+
+  const NO_SELECTED_CUSTOMER = "Клиент не выбран!";
+  const NO_SELECTED_DISHES = "Продукт не выбран!";
 </script>
 
 <style scoped>
